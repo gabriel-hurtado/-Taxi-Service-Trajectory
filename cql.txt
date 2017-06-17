@@ -1,0 +1,21 @@
+ CREATE TABLE timeSorted (   TripId  varchar, CallType varchar, start varchar, arrival varchar,startAll varchar, arrivalAll varchar, standId int, taxiId int, originCall int, hours int, day int, DayType varchar , month int, year int,   PRIMARY KEY (year, month, day, hours, TripId) ) WITH CLUSTERING ORDER BY (month ASC, day ASC, hours ASC);
+
+
+
+//
+
+
+ CREATE TABLE callTypeSorted (   TripId  varchar, CallType varchar, start varchar, arrival varchar,startAll varchar, arrivalAll varchar, standId int, taxiId int, originCall int, hours int, day int, DayType varchar , month int, year int,   PRIMARY KEY (CallType, TripId) );
+
+  CREATE TABLE startSorted (   TripId  varchar, CallType varchar, start varchar, arrival varchar,startAll varchar, arrivalAll varchar, standId int, taxiId int, originCall int, hours int, day int, DayType varchar , month int, year int,   PRIMARY KEY (start, TripId) );
+
+  CREATE TABLE arrivalSorted (   TripId  varchar, CallType varchar, start varchar, arrival varchar,startAll varchar, arrivalAll varchar, standId int, taxiId int, originCall int, hours int, day int, DayType varchar , month int, year int,   PRIMARY KEY (arrival, TripId) );
+
+    CREATE TABLE startArrivalSorted (   TripId  varchar, CallType varchar, start varchar, arrival varchar,startAll varchar, arrivalAll varchar, standId int, taxiId int, originCall int, hours int, day int, DayType varchar , month int, year int,   PRIMARY KEY (start,arrival, TripId) );
+
+
+CREATE TABLE standSorted (   TripId  varchar, CallType varchar, start varchar, arrival varchar,startAll varchar, arrivalAll varchar, standId int, taxiId int, originCall int, hours int, day int, DayType varchar , month int, year int,   PRIMARY KEY (standId, TripId) );
+
+CREATE TABLE taxiSorted (   TripId  varchar, CallType varchar, start varchar, arrival varchar,startAll varchar, arrivalAll varchar, standId int, taxiId int, originCall int, hours int, day int, DayType varchar , month int, year int,   PRIMARY KEY (taxiId, TripId) );
+
+CREATE TABLE callSorted (   TripId  varchar, CallType varchar, start varchar, arrival varchar,startAll varchar, arrivalAll varchar, standId int, taxiId int, originCall int, hours int, day int, DayType varchar , month int, year int,   PRIMARY KEY (originCall, TripId) );
