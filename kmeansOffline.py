@@ -8,6 +8,7 @@ import math
 import numpy
 import folium
 from folium import plugins
+from random import randint
 
 from cassandra.cluster import Cluster
 
@@ -32,10 +33,13 @@ def has_converged(mu, oldmu):
     
 
 def kmeansOffline(K,hoursConstraint):
-    rows = iter(session.execute('SELECT * FROM timesorted WHERE year>0 and month>0  and {0} ALLOW FILTERING ;'.format(hoursConstraint)))   
-    oldmu = getFirsts(rows,K)
+    fetchQuerry='SELECT * FROM timesorted WHERE year>0 and month>0  and {0}'.format(hoursConstraint+ 'ALLOW FILTERING {0};')
+    rows = iter(session.execute(fetchQuerry.format('limit 100')))   
     mu = getFirsts(rows,K)
-    while not has_converged(mu, oldmu):
+    oldmu={}
+    first=True
+    while (first or not( has_converged(mu, oldmu))):
+        rows = iter(fetchQuerry.format(''))   
         oldmu = mu
         S=[[0,0,0,0]]*K
         n=[0]*K
@@ -48,6 +52,7 @@ def kmeansOffline(K,hoursConstraint):
         for i in range(0,K):
             if(n[i]!=0):
                 mu[i]=numpy.divide(S[i], n[i]).tolist()
+        first=False
     return(mu)
 
 def cutter(coord):
@@ -88,6 +93,9 @@ def getNextPoint(rows):
     	return None
 
 def getFirsts(rows,K):
+    toSkip=randint(0, 100-K)
+    for i in range(0,toSkip):
+    	next(rows)
     mu={}
     for i in range(0,K):
         mu[i]=getNextPoint(rows)

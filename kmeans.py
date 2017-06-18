@@ -117,10 +117,12 @@ def getMinDist4D(allComb):
 	return w
 
 def kMeansOStartArrival(k):
+	i=0
 	list_Classes=[]
 	rows = session.execute('SELECT TripId, startall, arrivalall FROM startArrivalSorted limit 100000')
 	nb_Class=0;
 	for row in rows:
+		i+=1
 		#Return a point with values x and y
 		#print(row)
 		s=cutter(row.startall)
@@ -158,6 +160,7 @@ def kMeansOStartArrival(k):
 				q=0
 				f=2*f
 				#print("f=",f)
+	print(i)
 	return list_Classes
 
 def convertPlotting(mu):
