@@ -8,8 +8,9 @@ from cassandra.cluster import Cluster
 import folium
 from folium import plugins
 
-cluster = Cluster()
+cluster = Cluster(control_connection_timeout=9990.0)
 session = cluster.connect()
+session.default_timeout = 9999.0
 session.set_keyspace("e39_taxi")
 
 from math import radians, cos, sin, asin, sqrt
@@ -64,7 +65,7 @@ def getMinDist(allComb):
 
 def kMeansOStart(k):
 	list_Classes=[]
-	rows = session.execute('SELECT TripId, startall, arrivalall FROM startArrivalSorted limit 1000')
+	rows = session.execute('SELECT TripId, startall, arrivalall FROM startArrivalSorted ')#limit 1000')
 	nb_Class=0;
 	for row in rows:
 		#Return a point with values x and y
@@ -119,7 +120,7 @@ def getMinDist4D(allComb):
 def kMeansOStartArrival(k):
 	i=0
 	list_Classes=[]
-	rows = session.execute('SELECT TripId, startall, arrivalall FROM startArrivalSorted limit 100000')
+	rows = session.execute('SELECT TripId, startall, arrivalall FROM startArrivalSorted ')#limit 100000')
 	nb_Class=0;
 	for row in rows:
 		i+=1
@@ -137,7 +138,7 @@ def kMeansOStartArrival(k):
 				allComb=list(itertools.combinations(list_Classes, 2)) 		
 				dist=getMinDist4D(allComb)
 				#print(dist)
-				w=dist*8 #dist/2
+				w=dist #dist/2
 				f=w/k
 				r=1
 				q=0			
@@ -150,15 +151,17 @@ def kMeansOStartArrival(k):
 			#print(allComb)
 			dist=getMinDist4D(allComb)
 			#print(dist/f)
-			if(dist/f>1):
+			if(dist/f>1 and dist<(f+(f/500))): #dist<(f+(f/500))to remove outliers
 				nb_Class=nb_Class+1
 				list_Classes.append({"id":row.tripid,"start":s,"arrival":a,"class":nb_Class})
 				q=q+1
-				#print("added")
-			if(q>= 3*k*(1 + math.log(n))):
+				print(dist)
+				print({"id":row.tripid,"start":s,"arrival":a,"class":nb_Class})
+			if(q>= 0.5*k*(1 + math.log(n))):#3*k*(1 + math.log(n))):
 				r=r+1
 				q=0
 				f=2*f
+				print('upp')
 				#print("f=",f)
 	print(i)
 	return list_Classes
@@ -189,5 +192,5 @@ def plot(mu,name):
 
 mu=kMeansOStartArrival(1)
 mu=convertPlotting(mu)
-plot(mu,'onlinek_1_w8')
+plot(mu,'onlinek_homeTuned')
 	   

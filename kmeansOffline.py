@@ -12,7 +12,7 @@ from random import randint
 
 from cassandra.cluster import Cluster
 
-cluster = Cluster()
+cluster = Cluster(control_connection_timeout=9990.0)
 session = cluster.connect()
 session.default_timeout = 9999.0
 session.set_keyspace("e39_taxi")
@@ -33,13 +33,13 @@ def has_converged(mu, oldmu):
     
 
 def kmeansOffline(K,hoursConstraint):
-    fetchQuerry='SELECT * FROM timesorted WHERE year>0 and month>0  and {0}'.format(hoursConstraint+ 'ALLOW FILTERING {0};')
+    fetchQuerry='SELECT * FROM timesorted WHERE year>0 and month>0  and {0}'.format(hoursConstraint+ ' {0} ALLOW FILTERING ;')
     rows = iter(session.execute(fetchQuerry.format('limit 100')))   
     mu = getFirsts(rows,K)
     oldmu={}
     first=True
     while (first or not( has_converged(mu, oldmu))):
-        rows = iter(fetchQuerry.format(''))   
+        rows = iter(session.execute(fetchQuerry.format('')))   
         oldmu = mu
         S=[[0,0,0,0]]*K
         n=[0]*K
@@ -121,7 +121,7 @@ def plot(mu,name):
 
 	mapit.save( '{0}.html'.format(name))
 
-mu=kmeansOffline(6,'hours<16')
+mu=kmeansOffline(6,'hours<16 ')
 plot(mu,'hoursInf16')
-mu=kmeansOffline(6,'hours>16')
+mu=kmeansOffline(6,'hours>16 ')
 plot(mu,'hoursSup16')
